@@ -16,8 +16,11 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
 - Rotates battery priority to ensure equal usage over time
 - Target range instead of one setpoint.  
  **v1.2**
-- Check SOC while script is running, (and not only at beginning)
+- Check SOC while script is running. With low soc the battery is still allowed to charge and for discharge teh otehr way around.
 - Beter structure and naming of the settings.
+ **v1.3**
+- Added minimum power option.
+  
 
 ## Requirements
 - **Marstek battery**  
