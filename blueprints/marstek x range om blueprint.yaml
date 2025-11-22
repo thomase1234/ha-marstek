@@ -7,7 +7,7 @@ blueprint:
   
     New: Added minimum power
     
-    Improved: obeying max power
+    Fix:  max power 2500 instead of 2200
  
     Improved: changed priority offset default to day of year.
 
