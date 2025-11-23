@@ -36,14 +36,7 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
     - `_forcible_discharge_power`  
     - `_state_of_charge`  
 
-Example:  
-- If your fuse can handle a maximum of 2300 W, set a  range from -2300 to 2300.
-- you do not want you battery to which between charging and disharging, set range to -100 and 200.
-
-
-<img width="753" height="1371" alt="marstek xom" src="https://github.com/user-attachments/assets/4031e21e-133b-484f-a4da-37aecafb0895" />
-
-
+<img width="1064" height="2119" alt="afbeelding" src="https://github.com/user-attachments/assets/5bd956a6-7ace-43ad-8835-9b5820155093" />
 
 # Marstek XOM Blueprint
 Old version which is no longer maintained
