@@ -20,8 +20,8 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
  **v1.3**  
 - Added minimum power option.  
  **v1.4**  
-- Added maximum power option.
-  **v1.5**  
+- Added maximum power option.  
+ **v1.5**  
 - Added Keep SOC`s within 10% of each other option.  
 
 ## Requirements
