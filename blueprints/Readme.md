@@ -17,10 +17,11 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
 - Target range instead of one setpoint.  
  **v1.2**
 - Check SOC while script is running. With low soc the battery is still allowed to charge and for discharge teh otehr way around.
-- Beter structure and naming of the settings.
- **v1.3**
-- Added minimum power option.
-  
+- Beter structure and naming of the settings.  
+ **v1.3**  
+- Added minimum power option.  
+ **v1.4**  
+- Added maximum power option.  
 
 ## Requirements
 - **Marstek battery**  
