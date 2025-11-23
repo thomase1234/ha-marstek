@@ -1,15 +1,19 @@
 blueprint:
   name: Marstek X range on the Meter
   description: >
-    Control  Marstek Battery`s according to a grid sensor and a target range
-  
+    Control  Marstek Batteries according to a grid sensor and a target range  
+    
+    **Version**: 1.5
+    
+    New: Keep SOC`s within 10% of each other
+    
     **Version**: 1.4
   
     New: Added max power
     
     Improved: removed unused parameters
  
-    Improved: code variable order  
+    Improved: code variable order
       
     **Version**: 1.3
   
@@ -62,6 +66,12 @@ blueprint:
           default: "{{ now().timetuple().tm_yday }}"
           selector:
             template:
+        sort_by_soc:
+          name: Keep SOC`s within 10%
+          description: order the batteries by State of Charge so that they stay within 10% of each other.
+          default: true
+          selector:
+            boolean: {}
 
     power_section:
       name: Power
@@ -202,7 +212,8 @@ variables:
   target_max: !input setpoint_target_max
   
   smoothing: !input setpoint_smoothing_value
-
+  
+  sort_by_soc: !input sort_by_soc
 
 trigger:
   - trigger: state
@@ -307,7 +318,36 @@ action:
         {% set num_optimal = ((setpoint | abs) / balancing_battery_power) | round(0,'ceil') %}
         {% set batteries = namespace(entities=[], available=[], standby=[]) %}
 
+
+        {# Maak lijst van SOCs met index #}
+        {% set soc_list = [] %}
         {% for i in range(0,battery_count) %}
+          {% set soc_list = soc_list + [{"i": i, "soc": states(battery_soc_entity[i]) | int}] %}
+        {% endfor %}
+
+        {# Sorteer lijst op SOC of priority #}
+        {% if sort_by_soc == false %}
+          {% set sorted_list = range(0,battery_count) %}
+        {% else %}
+          {% if setpoint < 0 %}
+            {# Laden: afronden SOC naar boven op tientallen #}
+            {% for item in soc_list %}
+              {% set _ = item.update({"rounded": ((item.soc + 9)//10)*10}) %}
+            {% endfor %}
+            {% set sorted_list = soc_list | sort(attribute="rounded") | map(attribute="i") | list %}
+          {% elif setpoint > 0 %}
+            {# Ontladen: afronden SOC naar beneden op tientallen #}
+            {% for item in soc_list %}
+              {% set _ = item.update({"rounded": (item.soc//10)*10}) %}
+            {% endfor %}
+            {% set sorted_list = soc_list | sort(attribute="rounded", reverse=true) | map(attribute="i") | list %}
+          {% else %}
+            {% set sorted_list = range(0,battery_count) %}
+          {% endif %}
+        {% endif %}
+
+        {# Verdeel batteries in beschikbaar / standby #}
+        {% for i in sorted_list %}
           {% if batteries.available | count < num_optimal 
              and states(battery_rs485_control_entity[i]) == "enable"
              and (states(battery_soc_entity[i]) | int >= min_battery_level or setpoint < 0)
