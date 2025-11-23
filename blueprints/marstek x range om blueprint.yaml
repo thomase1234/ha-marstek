@@ -3,6 +3,14 @@ blueprint:
   description: >
     Control  Marstek Battery`s according to a grid sensor and a target range
   
+    **Version**: 1.4
+  
+    New: Added max power
+    
+    Improved: removed unused parameters
+ 
+    Improved: code variable order  
+      
     **Version**: 1.3
   
     New: Added minimum power
@@ -10,7 +18,6 @@ blueprint:
     Fix:  max power 2500 instead of 2200
  
     Improved: changed priority offset default to day of year.
-
   
   author: Tazzios (Based on PimDoos`s works)                   
   domain: automation
@@ -46,7 +53,7 @@ blueprint:
 
     rotation_section:
       name: Battery rotation
-      description: Rotate multiple battery 
+      description: Rotate multiple batteries 
       icon: mdi:rotate-3d-variant
       input:
         priority_offset_template:
@@ -63,15 +70,23 @@ blueprint:
       input:
         battery_optimal_min:
           name: Battery Minimum power
-          description: Minimum  power to start with charge or discharge. 
+          description: Minimum power to start a single battery with charge or discharge. 
           default: 20
           selector:
             number:
               min: 0
-              max: 5000
+              max: 2500
+        battery_optimal_balancing:
+          name: Max optimal power
+          description: Amount of power required before loadbalancing to more batteries
+          default: 2000
+          selector:
+            number:
+              min: 50
+              max: 2500
         battery_optimal_max:
-          name: Battery optimal maximum power
-          description: Amount of power before loadbalancing to more batteries. When there are not enough battery's the power can be higher(2500)                                                                                       
+          name: Battery maximum power
+          description: Maximum  power that a single battery is allowed for charge or discharge.                                                                                     
           default: 2500
           selector:
             number:
@@ -163,41 +178,36 @@ blueprint:
             seconds: 10
           selector:
             duration: {}
-        update_timeout:
-          name: Update timeout
-          description: Maximum time to wait for new data from the grid sensor                                                                       
-          default:
-            minutes: 1
-          selector:
-            duration: {}
-        debug_mode:
-          name: Debug Mode
-          default: false
-          selector:
-            boolean: {}
+
 
 variables:
-  device_ids: !input battery_device
-  
-  min_battery_power: !input battery_optimal_min
-  max_battery_power: !input battery_optimal_max
-  
-  grid_entity: !input grid_entity
-  smoothing: !input setpoint_smoothing_value
-  offset_entity: !input offset_entity
-  
+  device_ids: !input battery_device  
   min_battery_level: !input battery_soc_min
   max_battery_level: !input battery_soc_max
   
-  target_min: !input setpoint_target_min
-  target_max: !input setpoint_target_max
+  offset_entity: !input offset_entity
   
+  min_battery_power: !input battery_optimal_min
+  balancing_battery_power : !input battery_optimal_balancing
+  max_battery_power: !input battery_optimal_max
   # This makes 'min_setpoint' the opposite (negative) of the configured minimum setpoint.
   # For example: if setpoint_min = 12000 → min_setpoint = -12000
   setpoint_min: !input setpoint_min
   min_setpoint: >
     {{ 0 - (setpoint_min | float) }}
   max_setpoint: !input setpoint_max
+
+  
+  grid_entity: !input grid_entity
+  target_min: !input setpoint_target_min
+  target_max: !input setpoint_target_max
+  
+  smoothing: !input setpoint_smoothing_value
+
+  
+
+
+  
 
 
 
@@ -263,6 +273,7 @@ action:
         {{ grid_power * multiplier }}
 
   - variables:
+      # Count all actueel deliverd power of the batteries together
       battery: >
         {{  battery_acpower_entity | map("states") | list | map('int') | sum }}
       offset_total: >
@@ -293,7 +304,7 @@ action:
 
   - variables:      
       battery_setpoints: >
-        {% set num_optimal = ((setpoint | abs) / max_battery_power) | round(0,'ceil') %}
+        {% set num_optimal = ((setpoint | abs) / balancing_battery_power) | round(0,'ceil') %}
         {% set batteries = namespace(entities=[], available=[], standby=[]) %}
         {% for i in range(0,battery_count) %}
           {# Haal de SOC entity direct op voor deze device #}
@@ -314,7 +325,7 @@ action:
           {% set value = (setpoint / divisor) | int %}
           
           {# Pas max en min limieten toe #}
-          {% set value = [[value, -2500] | max, 2500] | min %}
+          {% set value = [[value, -max_battery_power] | max, max_battery_power] | min %}
           {% if value | abs < min_battery_power %}
             {% set value = 0 %}
           {% endif %}
