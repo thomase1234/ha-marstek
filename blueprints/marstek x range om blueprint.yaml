@@ -69,7 +69,7 @@ blueprint:
         sort_by_soc:
           name: Keep SOC`s within 10%
           description: order the batteries by State of Charge so that they stay within 10% of each other.
-          default: true
+          default: false
           selector:
             boolean: {}
 
