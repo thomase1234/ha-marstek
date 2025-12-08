@@ -1,0 +1,36 @@
+Version: 1.6  
+Improved: less modbus updates  
+Fix: Keep SOC`s within 10% of each other
+
+Version: 1.5
+New: Keep SOC`s within 10% of each other
+
+Version: 1.4
+New: Added max power
+Improved: removed unused parameters
+Improved: code variable order
+
+Version: 1.3
+New: Added minimum power
+Fix: max power 2500 instead of 2200
+Improved: changed priority offset default to day of year.
+
+Version: 1.2  
+**Breaking change**: 'Minimum power setpoint' is inverted and renamed to 'Maximum Charge'  
+New: Checks the soc during running the script for min and max.  
+Improved:Refactored min and max power setpoints, also new renamed.  
+Improved: Structured and reordered the settings in sections.   
+Improved: set default interval and timeout time.
+
+Version: 1.1
+New:  Target range instead of one setpoint.  
+
+Version: 1.0  
+Edited PimDoos: [HA Sessy NOM](https://github.com/PimDoos/ha-sessy-examples/tree/main) to work with Marstek and lilygo modbus [MarstekVenus-LilygoRS485](https://github.com/Superduper1969/MarstekVenus-LilygoRS485).  
+Features:
+- Rotates battery priority to ensure equal usage over time  
+- Dynamic load balancing across multiple batteries  
+- SOC-based inclusion/exclusion for optimal battery health  
+- Optional offsets for other power consumers (e.g., EV chargers)  
+- Smooth transitions between setpoints to prevent sudden battery stress  
+
