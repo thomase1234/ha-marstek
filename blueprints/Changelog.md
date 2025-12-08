@@ -1,28 +1,29 @@
 Version: 1.6  
 Improved: less modbus updates  
-Fix: Keep SOC`s within 10% of each other
+fix: Rewrite, keep SOC`s within 10% of each other  
+New: Debugging shown in trace
 
-Version: 1.5
+Version: 1.5  
 New: Keep SOC`s within 10% of each other
 
-Version: 1.4
-New: Added max power
-Improved: removed unused parameters
+Version: 1.4  
+New: Added max power  
+Improved: removed unused parameters  
 Improved: code variable order
 
-Version: 1.3
-New: Added minimum power
-Fix: max power 2500 instead of 2200
-Improved: changed priority offset default to day of year.
+Version: 1.3  
+New: Added minimum power  
+Fix: max power 2500 instead of 2200  
+Improved: changed priority offset default to day of year.  
 
 Version: 1.2  
 **Breaking change**: 'Minimum power setpoint' is inverted and renamed to 'Maximum Charge'  
 New: Checks the soc during running the script for min and max.  
-Improved:Refactored min and max power setpoints, also new renamed.  
+Improved: Refactored min and max power setpoints, also new renamed.  
 Improved: Structured and reordered the settings in sections.   
 Improved: set default interval and timeout time.
 
-Version: 1.1
+Version: 1.1  
 New:  Target range instead of one setpoint.  
 
 Version: 1.0  
