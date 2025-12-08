@@ -1,7 +1,7 @@
 
 
 # Marstek X Range OM Blueprint 
-This Home Assistant automation controls Marstek batteries according to a **grid sensor**, managing **charging, discharging, and load balancing** across multiple batteries. It ensures that batteries operate efficiently within set limits and adjusts setpoint range dynamically based on grid consumption, battery SOC, and optional offsets. But it can also be used to normal load or unload your batteries 
+This Home Assistant automation controls Marstek batteries according to a **grid sensor**, managing **charging, discharging, and load balancing** across multiple batteries. It ensures that batteries operate efficiently within set limits and adjusts setpoint range dynamically based on grid consumption, battery SOC, and optional offsets. But it can also be used to normal load or unload your batteries. 
 Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-sessy-examples/tree/main)  
 
 > **XOM** stands for **X on the Meter**, an alternative to NOM (which stands for Nul op de Meter).
@@ -12,17 +12,10 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
 - Dynamic load balancing across multiple batteries  
 - SOC-based inclusion/exclusion for optimal battery health  
 - Optional offsets for other power consumers (e.g., EV chargers)  
-- Smooth transitions between setpoints to prevent sudden battery stress  
-- Rotates battery priority to ensure equal usage over time
-- Target range instead of one setpoint.  
- **v1.2**
-- Beter structure and naming of the settings.  
- **v1.3**  
-- Added minimum power option.  
- **v1.4**  
-- Added maximum power option.  
- **v1.5**  
-- Added Keep SOC`s within 10% of each other option.  
+- Smooth transitions between setpoints to prevent sudden battery stress.  
+- Rotates by priority template or  Keep SOC`s within 10% of each other option to ensure equal usage over time.  
+- Set Target range.  
+- Minimum and maximum power option.     
 
 ## Requirements
 - **Marstek battery**  
