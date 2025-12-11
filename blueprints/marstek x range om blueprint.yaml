@@ -245,7 +245,7 @@ action:
         {% set total_ac_power = namespace(value=0) %}
         
         {% for dev in device_ids_list %}
-          {% set ac_entity = device_entities(dev) | select("search","_ac_power$") | list %}
+          {% set ac_entity = device_entities(dev) | select("search","ac_power$") | list %}
           {% if ac_entity %}
             {% set ac_value = states(ac_entity[0]) | float(0) %}
             {% set total_ac_power.value = total_ac_power.value + ac_value %}
@@ -300,7 +300,7 @@ action:
         
         {% set soc_map = namespace(list=[]) %}
         {% for dev in device_ids %}
-          {% set soc_entity = device_entities(dev) | select("search", "_state_of_charge$") | list %}
+          {% set soc_entity = device_entities(dev) | select("search", "state_of_charge$") | list %}
           {% if soc_entity %}
             {% set soc_value = states(soc_entity[0]) | int %}
             {% if setpoint < 0 %}
@@ -355,42 +355,35 @@ action:
       battery_rs485_control_entity: >
         {% set entities = namespace(rs485_control=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.rs485_control = entities.rs485_control + [device_entities(device_id) | list | select("search","_rs485_control_mode$") | list | join("")] %}
+          {% set entities.rs485_control = entities.rs485_control + [device_entities(device_id) | list | select("search","rs485_control_mode$") | list | join("")] %}
         {% endfor %}
         {{ entities.rs485_control[priority_offset:] + entities.rs485_control[:priority_offset] }}
 
       battery_mode_entity: >
         {% set entities = namespace(mode=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.mode = entities.mode + [device_entities(device_id) | list | select("search","_forcible_charge_discharge$") | list | join("")] %}
+          {% set entities.mode = entities.mode + [device_entities(device_id) | list | select("search","forcible_charge_discharge$") | list | join("")] %}
         {% endfor %}
         {{ entities.mode[priority_offset:] + entities.mode[:priority_offset] }}
         
-#      battery_acpower_entity: >
-#        {% set entities = namespace(acpower=[]) %}
-#        {% for device_id in device_ids %}
-#        {% set entities.acpower = entities.acpower + [device_entities(device_id) | list | select("search","_ac_power$") | list | join("")] %}
-#        {% endfor %}
-#        {{ entities.acpower[priority_offset:] + entities.acpower[:priority_offset] }}
-
       battery_setpointcharge_entity: >
         {% set entities = namespace(setpointcharge=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.setpointcharge = entities.setpointcharge + [device_entities(device_id) | list | select("search","_forcible_charge_power$") | list | join("")] %}
+          {% set entities.setpointcharge = entities.setpointcharge + [device_entities(device_id) | list | select("search","forcible_charge_power$") | list | join("")] %}
         {% endfor %}
         {{ entities.setpointcharge[priority_offset:] + entities.setpointcharge[:priority_offset] }}
 
       battery_setpointdischarge_entity: >
         {% set entities = namespace(setpointdischarge=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.setpointdischarge = entities.setpointdischarge + [device_entities(device_id) | list | select("search","_forcible_discharge_power$") | list | join("")] %}
+          {% set entities.setpointdischarge = entities.setpointdischarge + [device_entities(device_id) | list | select("search","forcible_discharge_power$") | list | join("")] %}
         {% endfor %}
         {{ entities.setpointdischarge[priority_offset:] + entities.setpointdischarge[:priority_offset] }}
 
       battery_soc_entity: >
         {% set entities = namespace(soc=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.soc = entities.soc + [device_entities(device_id) | list | select("search","_state_of_charge$") | list | join("")] %}
+          {% set entities.soc = entities.soc + [device_entities(device_id) | list | select("search","state_of_charge$") | list | join("")] %}
         {% endfor %}
         {{ entities.soc[priority_offset:] + entities.soc[:priority_offset] }}
 
