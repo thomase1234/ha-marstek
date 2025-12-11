@@ -5,7 +5,10 @@ blueprint:
     
     Version: 1.7
     
-    new: Support for [fonske M5stack](https://github.com/fonske/MarstekVenus-M5stackRS485) and [fonske Lilygo](https://github.com/fonske/MarstekVenus-LilygoRS485) 
+    new: Support for [fonske M5stack](https://github.com/fonske/MarstekVenus-M5stackRS485) and [fonske Lilygo](https://github.com/fonske/MarstekVenus-LilygoRS485)
+
+    Fix: Fix variable name in battery power calculation #4
+
   
 
   author: Tazzios (Based on PimDoos`s works)                   
