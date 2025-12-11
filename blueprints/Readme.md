@@ -18,16 +18,19 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
 - Minimum and maximum power option.     
 
 ## Requirements
-- **Marstek battery**  
-- **Lilygo with ESPHome**  
-  - Repository: [MarstekVenus-LilygoRS485](https://github.com/Superduper1969/MarstekVenus-LilygoRS485)  
-    Your entity names must end in: (the part before the underscore can be customized)
-    - `_rs485_control_mode`  
-    - `_forcible_charge_discharge`  
-    - `_ac_power`  
-    - `_forcible_charge_power`  
-    - `_forcible_discharge_power`  
-    - `_state_of_charge`  
+- Marstek Venus E v1,v2 or v3.
+- Supported ESPHome configurations
+  - [fonske/MarstekVenus-LilygoRS485](https://github.com/fonske/MarstekVenus-LilygoRS485)  
+  - [onske/MarstekVenus-M5stackRS485](https://github.com/fonske/MarstekVenus-M5stackRS485)  
+  - [Superduper1969/MarstekVenus-LilygoRS485](https://github.com/Superduper1969/MarstekVenus-LilygoRS485)
+
+or other ESPHOME software that has the following entities endig with in home assistant:
+  - `rs485_control_mode`  
+  - `forcible_charge_discharge`  
+  - `ac_power`  
+  - `forcible_charge_power`  
+  - `forcible_discharge_power`  
+  - `state_of_charge` 
 
 <img width="1064" height="2119" alt="afbeelding" src="https://github.com/user-attachments/assets/5bd956a6-7ace-43ad-8835-9b5820155093" />
 
