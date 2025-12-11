@@ -241,7 +241,7 @@ action:
       Battery_ac_power_total: >
         {% set total_ac_power = namespace(value=0) %}
         
-        {% for dev in device_ids_list %}
+        {% for dev in device_ids %}
           {% set ac_entity = device_entities(dev) | select("search","ac_power$") | list %}
           {% if ac_entity %}
             {% set ac_value = states(ac_entity[0]) | float(0) %}
