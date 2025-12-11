@@ -1,5 +1,6 @@
 Version: 1.7  
-New: Support for [fonske M5stack](https://github.com/fonske/MarstekVenus-M5stackRS485) and [fonske Lilygo](https://github.com/fonske/MarstekVenus-LilygoRS485) 
+New: Support for [fonske M5stack](https://github.com/fonske/MarstekVenus-M5stackRS485) and [fonske Lilygo](https://github.com/fonske/MarstekVenus-LilygoRS485)  
+Fix: variable name in battery ac power calculation #4
 
 Version: 1.6  
 Improved: less modbus updates  
