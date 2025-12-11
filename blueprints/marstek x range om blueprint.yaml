@@ -3,13 +3,10 @@ blueprint:
   description: >
     Control  Marstek Batteries according to a grid sensor and a target range  
     
-    **Version**: 1.6
+    Version: 1.7
     
-    Improved: less modbus updates
+    new: Support for [fonske M5stack](https://github.com/fonske/MarstekVenus-M5stackRS485) and [fonske Lilygo](https://github.com/fonske/MarstekVenus-LilygoRS485) 
   
-    Fix: Keep SOC`s within 10% of each other
-    
-    New: Debugging shown in trace
 
   author: Tazzios (Based on PimDoos`s works)                   
   domain: automation
