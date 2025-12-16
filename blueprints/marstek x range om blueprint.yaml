@@ -3,17 +3,23 @@ blueprint:
   description: >
     Control  Marstek Batteries according to a grid sensor and a target range  
     
-    Version: 1.7
+    **Version: 1.8 Let's go smooth!**
     
-    new: Support for [fonske M5stack](https://github.com/fonske/MarstekVenus-M5stackRS485) and [fonske Lilygo](https://github.com/fonske/MarstekVenus-LilygoRS485)
-
-    Fix: Fix variable name in battery power calculation #4
-
+    Breaking: smoothing is renamed to smoothing_max_watts
+    
+    New: minimum different in setpoint change
+    
+    New: Zero deadband
+    
+    New: Smoothing factor
+    
+    New: Smoothing factor when passing zero
   
 
   author: Tazzios (Based on PimDoos`s works)                   
   domain: automation
   input:
+
     battery_section:
       name: Battery selection
       icon: mdi:battery
@@ -110,6 +116,7 @@ blueprint:
               min: 0
               max: 12000
               mode: box              
+
     target_section:
       name: Target
       icon: mdi:target
@@ -134,6 +141,7 @@ blueprint:
                   - sensor
                   - number
                   - input_number
+
     setpoint_section:
       name: Setpoint
       description: Set min and max the same if you want a fixed target.  
@@ -157,18 +165,60 @@ blueprint:
               min: -5000
               max: 10000
               mode: box
-    script_section:
-      name: Script
+ 
+    smooth_section:
+      name: smoothing
+      description: Various option to control the smoothing of the setpoint.
       icon: mdi:tune                  
       input:
-        setpoint_smoothing_value:
-          name: Smoothing value
-          description: Maximum delta between two setpoints. This should not be lower than the Minimum Power of the battery.                                                                                                                   
+        smoothing_min_watts:
+          name: Minimum differents 
+          description: minimum delta (in watts) between previous and new setpoints. This should not be lower than the Minimum Power of one battery.                                                                                                                   
+          default: 25
+          selector:
+            number:
+              min: 0
+              max: 500
+        smoothing_max_watts:
+          name: Maximum differents 
+          description: Maximum delta (in watts) between previous and new setpoints.                                                                                                                   
           default: 2000
           selector:
             number:
               min: 50
-              max: 2500
+              max: 10000
+        zero_deadband:
+          name: Deadband around zero 
+          description: Example with a value of 50 watts setpoints between -50 and +50 setpoint will be set to 0.                                                                                                                   
+          default: 50
+          selector:
+            number:
+              min: 0
+              max: 200
+              mode: box
+        smoothing_factor:
+          name: smoothing factor
+          description: Example with old setpoint 1500 new 500 and factor 0.7. The differents 1500-500= 1000*0.7=700 new setpoint will be 1500-700=800. 1 to disable.                                                                                                                     
+          default: 0.7
+          selector:
+            number:
+              step: 0.01
+              min: 0.01
+              max: 1
+        smoothing_factor_zero:
+          name: smoothing factor when passing zero
+          description: Same as above only this one is used when 0 is crossed. Set this lower to avoid switching between charge/discharge. 1 to disable                                                                                                                  
+          default: 0.3
+          selector:
+            number:
+              step: 0.01
+              min: 0.01
+              max: 1
+              
+    script_section:
+      name: Script
+      icon: mdi:tune
+      input:
         update_interval:
           name: Update interval
           description: Time to wait before accepting new data from the grid sensor                                                                                
@@ -213,8 +263,14 @@ variables:
   target_min: !input setpoint_target_min
   target_max: !input setpoint_target_max
   
+  #smoothing
+  smoothing_min_watts: !input smoothing_min_watts
+  smoothing_max_watts: !input smoothing_max_watts 
+  zero_deadband: !input zero_deadband
+  smoothing_factor: !input smoothing_factor
+  smoothing_factor_zero: !input smoothing_factor_zero
+  
   # Script
-  smoothing: !input setpoint_smoothing_value
   debug: !input debug
   
 
@@ -258,22 +314,48 @@ action:
         {% set net_load = Battery_ac_power_total + grid %}
         {% if net_load < target_min %}
           {# te veel export -> laad batterij #}
-          {% set target_diff = (net_load - offset_total ) - target_min %}
+          {% set target = (net_load - offset_total ) - target_min %}
         {% elif net_load > target_max %}
           {# te veel import -> ontlaad batterij #}
-          {% set target_diff = (net_load - offset_total) - target_max %}
+          {% set target = (net_load - offset_total) - target_max %}
         {% else %}
-          {% set target_diff = 0 - offset_total%}
+          {% set target = 0 - offset_total%}
         {% endif %}
 
-        {% if target_diff != 0%}
-            {% set lower = [target_diff, Battery_ac_power_total - smoothing, min_setpoint] | max %}
-            {% set setpoint_smooth = [lower, Battery_ac_power_total + smoothing, max_setpoint] | min %}
-            {{ setpoint_smooth }}
+
+        {# --- minimale verschil in watts --- #}
+        {% if (target - Battery_ac_power_total) | abs < smoothing_min_watts %}
+          {% set raw_setpoint = Battery_ac_power_total %}
         {% else %}
-            {{ target_diff }}
+          {% set raw_setpoint = target %}
         {% endif %}
- 
+
+        {# --- maximale stap begrenzen in watts --- #}
+        {% if raw_setpoint != 0 %}
+          {% set raw_setpoint = [raw_setpoint, Battery_ac_power_total - smoothing_max_watts, min_setpoint] | max %}
+          {% set raw_setpoint = [raw_setpoint, Battery_ac_power_total + smoothing_max_watts, max_setpoint] | min %}
+        {% else %}
+          {% set raw_setpoint = 0 %}
+        {% endif %}
+
+        {# --- nul-kruising detecteren en juiste smoothing factor kiezen --- #}
+        {% if (raw_setpoint > 0 and Battery_ac_power_total < 0) or  (raw_setpoint < 0 and Battery_ac_power_total > 0) %}
+          {% set sf = smoothing_factor_zero  %}
+        {% else %}
+          {% set sf = smoothing_factor %} 
+        {% endif %}
+         
+        {# --- exponentiële smoothing toepassen --- #}
+        {% set setpoint_smooth = sf * raw_setpoint + (1 - sf) * Battery_ac_power_total %}
+        
+        {# --- deadband rond nul --- #}
+        {% if setpoint_smooth | abs < zero_deadband %}
+          0
+        {% else %}
+          {{ setpoint_smooth | round(0) }}
+        {% endif %} 
+         
+         
   - choose:
         - conditions:
             - condition: template
@@ -514,7 +596,7 @@ action:
                             entity_id: >
                               {{ repeat.item.mode }}
                           data:
-                            option: charge
+                            option: stop
                 - action: number.set_value
                   continue_on_error: true
                   target:
@@ -564,7 +646,7 @@ action:
                             entity_id: >
                               {{ repeat.item.mode }}
                           data:
-                            option: discharge
+                            option: stop
                 - action: number.set_value
                   continue_on_error: true
                   target:
