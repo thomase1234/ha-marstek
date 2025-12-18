@@ -1,8 +1,7 @@
 Version: 1.8 Let's go smooth!  
 Breaking: smoothing is renamed to smoothing_max_watts  
 New: minimum different in setpoint change  
-New: Zero deadband  
-New: Smoothing factor  
+New: Smoothing factor above delta x   
 New: Smoothing factor when passing zero  
 
 Version: 1.7  
