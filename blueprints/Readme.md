@@ -33,9 +33,10 @@ or other ESPHOME software that has the following entities endig with in home ass
   - `ac_power`  
   - `forcible_charge_power`  
   - `forcible_discharge_power`  
-  - `state_of_charge` 
+  - `state_of_charge`
+  - 
+<img width="1049" height="2754" alt="afbeelding" src="https://github.com/user-attachments/assets/d0127555-b8c1-460e-a94d-375b2d5057f2" />
 
-<img width="1064" height="2119" alt="afbeelding" src="https://github.com/user-attachments/assets/5bd956a6-7ace-43ad-8835-9b5820155093" />
 
 # Marstek XOM Blueprint
 Old version which is no longer maintained
