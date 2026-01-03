@@ -11,11 +11,14 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
 ## Key Features
 - Dynamic load balancing across multiple batteries  
 - SOC-based inclusion/exclusion for optimal battery health  
-- Optional offsets for other power consumers (e.g., EV chargers)  
-- Smooth transitions between setpoints to prevent sudden battery stress.  
+- Optional offsets for other power consumers (e.g., EV chargers)    
 - Rotates by priority template or  Keep SOC`s within 10% of each other option to ensure equal usage over time.  
-- Set Target range.  
-- Minimum and maximum power option.     
+- Set target range, create a deadband.  
+- Minimum and maximum power option.
+- Smooth transitions, minimum and maximum different in setpoint changes.
+- Smooth transitions, Smoothing factor above adjustable level.
+- Smooth transitions, seperate smoothing factor when passing zero.  
+
 
 ## Requirements
 - Marstek Venus E v1,v2 or v3.

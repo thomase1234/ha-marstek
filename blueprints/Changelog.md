@@ -1,3 +1,9 @@
+Version: 1.8 Let's go smooth!  
+Breaking: smoothing is renamed to smoothing_max_watts  
+New: minimum different in setpoint change  
+New: Smoothing factor above delta x   
+New: Smoothing factor when passing zero  
+
 Version: 1.7  
 New: Support for [fonske M5stack](https://github.com/fonske/MarstekVenus-M5stackRS485) and [fonske Lilygo](https://github.com/fonske/MarstekVenus-LilygoRS485)  
 Fix: variable name in battery ac power calculation #4
