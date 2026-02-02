@@ -4,6 +4,10 @@ blueprint:
     Control  Marstek Batteries according to a grid sensor and a target range  
     
     **Version: 1.9 **
+
+    New: [marstek venus modbus](https://github.com/ViperRNMC/marstek_venus_modbus/tree/main) support
+
+
     
 
 
