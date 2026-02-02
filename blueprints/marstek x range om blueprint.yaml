@@ -498,7 +498,7 @@ action:
           {% if integrations | count > 0 %}
             {% set integration = integrations[0] %}
           {% else %}
-            {% set integration = 'unknown' %}
+            {% set integration = 'esphome' %}
           {% endif %}
                     
         
