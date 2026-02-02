@@ -21,12 +21,17 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
 
 
 ## Requirements
+ Easy
+- Marstek venus with the Local API enabl (modbus over ethernet)
+- HA integration [ marstek venus modbus](https://github.com/ViperRNMC/marstek_venus_modbus/tree/main)
+
+Oldway
 - Marstek Venus E v1,v2 or v3.
 - Supported ESPHome configurations
   - [fonske/MarstekVenus-LilygoRS485](https://github.com/fonske/MarstekVenus-LilygoRS485)  
   - [onske/MarstekVenus-M5stackRS485](https://github.com/fonske/MarstekVenus-M5stackRS485)  
   - [Superduper1969/MarstekVenus-LilygoRS485](https://github.com/Superduper1969/MarstekVenus-LilygoRS485)
-
+    
 or other ESPHOME software that has the following entities endig with in home assistant:
   - `rs485_control_mode`  
   - `forcible_charge_discharge`  
@@ -34,9 +39,6 @@ or other ESPHOME software that has the following entities endig with in home ass
   - `forcible_charge_power`  
   - `forcible_discharge_power`  
   - `state_of_charge`
-  - 
-<img width="1049" height="2754" alt="afbeelding" src="https://github.com/user-attachments/assets/d0127555-b8c1-460e-a94d-375b2d5057f2" />
+   
+<img width="1044" height="2700" alt="afbeelding" src="https://github.com/user-attachments/assets/3df0eab8-e75f-4501-8fe3-ad80615df4d8" />
 
-
-# Marstek XOM Blueprint
-Old version which is no longer maintained
