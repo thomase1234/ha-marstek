@@ -24,6 +24,7 @@ Based on the work of PimDoos: [HA Sessy Examples](https://github.com/PimDoos/ha-
  Easy
 - Marstek venus with the Local API enabl (modbus over ethernet)
 - HA integration [ marstek venus modbus](https://github.com/ViperRNMC/marstek_venus_modbus/tree/main)
+  - do not forget to enabled the neccesary entities mentioned below. 
 
 Oldway
 - Marstek Venus E v1,v2 or v3.
