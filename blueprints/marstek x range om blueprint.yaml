@@ -492,14 +492,7 @@ action:
         
                 
           {# --- Bepaal de integratie --- #}
-          {% set dev = device_id(battery_rs485_control_entity[i]) %}
-          {% set ids = device_attr(dev, 'identifiers') or [] %}
-          {% set integrations = ids | map('first') | list %}
-          {% if integrations | count > 0 %}
-            {% set integration = integrations[0] %}
-          {% else %}
-            {% set integration = 'esphome' %}
-          {% endif %}
+          {% set integration = config_entry_attr(config_entry_id(battery_rs485_control_entity[i]), 'domain') %}  
                     
         
           {% set value = (setpoint / divisor) | int %}
@@ -523,14 +516,7 @@ action:
         {% for i in batteries.standby %}
         
           {# --- Bepaal de integratie --- #}
-          {% set dev = device_id(battery_rs485_control_entity[i]) %}
-          {% set ids = device_attr(dev, 'identifiers') or [] %}
-          {% set integrations = ids | map('first') | list %}
-          {% if integrations | count > 0 %}
-            {% set integration = integrations[0] %}
-          {% else %}
-            {% set integration = 'unknown' %}
-          {% endif %}
+          {% set integration = config_entry_attr(config_entry_id(battery_rs485_control_entity[i]), 'domain') %}  
         
           {% set batteries.entities = batteries.entities + [{
             "setpointcharge": battery_setpointcharge_entity[i],
