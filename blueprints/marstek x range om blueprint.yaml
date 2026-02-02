@@ -3,15 +3,12 @@ blueprint:
   description: >
     Control  Marstek Batteries according to a grid sensor and a target range  
     
-    **Version: 1.8 Let's go smooth!**
+    **Version: 1.9 **
+
+    New: [marstek venus modbus](https://github.com/ViperRNMC/marstek_venus_modbus/tree/main) support
+
+
     
-    Breaking: smoothing is renamed to smoothing_max_watts
-    
-    New: minimum different in setpoint change
-    
-    New: Smoothing factor
-    
-    New: Smoothing factor when passing zero
 
 
 
@@ -31,7 +28,8 @@ blueprint:
           selector:
             device:
               filter:
-                integration: esphome
+                - integration: esphome
+                - integration: marstek_modbus
               multiple: true
         battery_soc_min:
           name: Minimum State of Charge
@@ -145,7 +143,7 @@ blueprint:
 
     setpoint_section:
       name: Setpoint
-      description: With min and max your can create a deadband (-50 50) or set them the same if you want a fixed target. High value for charging and negative value for discharging.
+      description: You can create a deadband (-50 and 50) or set them the same if you want a fixed target. High value for charging and negative value for discharging.
       icon: mdi:flash                     
       input:
         setpoint_target_min:
@@ -302,7 +300,7 @@ action:
         {% set total_ac_power = namespace(value=0) %}
         
         {% for dev in device_ids %}
-          {% set ac_entity = device_entities(dev) | select("search","ac_power$") | list %}
+          {% set ac_entity = device_entities(dev) | select("search","(ac_power|ac_vermogen)$") | list %}
           {% if ac_entity %}
             {% set ac_value = states(ac_entity[0]) | float(0) %}
             {% set total_ac_power.value = total_ac_power.value + ac_value %}
@@ -352,6 +350,8 @@ action:
         {% set setpoint_smooth = sf * raw_setpoint + (1 - sf) * Battery_ac_power_total %}
         
         {{ setpoint_smooth | round(0) }}
+
+         
          
   - choose:
         - conditions:
@@ -379,7 +379,7 @@ action:
         
         {% set soc_map = namespace(list=[]) %}
         {% for dev in device_ids %}
-          {% set soc_entity = device_entities(dev) | select("search", "state_of_charge$") | list %}
+          {% set soc_entity = device_entities(dev) | select("search", "(state_of_charge|battery_soc|batterij_soc|batterie-Ladezustand)$") | list %}
           {% if soc_entity %}
             {% set soc_value = states(soc_entity[0]) | int %}
             {% if setpoint < 0 %}
@@ -431,38 +431,39 @@ action:
   # Battery entities into an array        
   - variables:
       # Get Entity IDs from device IDs
+      # in the search the entitity searchs is as followed lily / m5stack, ViperRNMC EN,ViperRNMC NL, ViperRNMC De
       battery_rs485_control_entity: >
         {% set entities = namespace(rs485_control=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.rs485_control = entities.rs485_control + [device_entities(device_id) | list | select("search","rs485_control_mode$") | list | join("")] %}
+          {% set entities.rs485_control = entities.rs485_control + [device_entities(device_id) | list | select("search","(rs485_control_mode|rs485_control_mode|rs485_besturingsmodus|rs485_steuermodus)$") | list | join("")] %}
         {% endfor %}
         {{ entities.rs485_control[priority_offset:] + entities.rs485_control[:priority_offset] }}
 
       battery_mode_entity: >
         {% set entities = namespace(mode=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.mode = entities.mode + [device_entities(device_id) | list | select("search","forcible_charge_discharge$") | list | join("")] %}
+          {% set entities.mode = entities.mode + [device_entities(device_id) | list | select("search","(forcible_charge_discharge|force_mode|geforceerde_modus|force_mode)$") | list | join("")] %}
         {% endfor %}
         {{ entities.mode[priority_offset:] + entities.mode[:priority_offset] }}
         
       battery_setpointcharge_entity: >
         {% set entities = namespace(setpointcharge=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.setpointcharge = entities.setpointcharge + [device_entities(device_id) | list | select("search","forcible_charge_power$") | list | join("")] %}
+          {% set entities.setpointcharge = entities.setpointcharge + [device_entities(device_id) | list | select("search","(forcible_charge_power|set_forcible_charge_power|forceer_laadvermogen|ladeleistung_einstellen)$") | list | join("")] %}
         {% endfor %}
         {{ entities.setpointcharge[priority_offset:] + entities.setpointcharge[:priority_offset] }}
 
       battery_setpointdischarge_entity: >
         {% set entities = namespace(setpointdischarge=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.setpointdischarge = entities.setpointdischarge + [device_entities(device_id) | list | select("search","forcible_discharge_power$") | list | join("")] %}
+          {% set entities.setpointdischarge = entities.setpointdischarge + [device_entities(device_id) | list | select("search","(forcible_discharge_power|set_forcible_discharge_power|forceer_ontlaadvermogen|entladeleistung_einstellen)$") | list | join("")] %}
         {% endfor %}
         {{ entities.setpointdischarge[priority_offset:] + entities.setpointdischarge[:priority_offset] }}
 
       battery_soc_entity: >
         {% set entities = namespace(soc=[]) %}
         {% for device_id in device_ids %}
-          {% set entities.soc = entities.soc + [device_entities(device_id) | list | select("search","state_of_charge$") | list | join("")] %}
+          {% set entities.soc = entities.soc + [device_entities(device_id) | list | select("search","(state_of_charge|battery_soc|batterij_soc|batterie-Ladezustand)$") | list | join("")] %}
         {% endfor %}
         {{ entities.soc[priority_offset:] + entities.soc[:priority_offset] }}
 
@@ -474,8 +475,10 @@ action:
 
         {# Verdeel batteries in beschikbaar / standby #}
         {% for i in range(0,battery_count) %}
+        
+
           {% if batteries.available | count < num_optimal 
-             and states(battery_rs485_control_entity[i]) == "enable"
+             and (states(battery_rs485_control_entity[i]) == "enable" or states(battery_rs485_control_entity[i]) == "on")
              and (states(battery_soc_entity[i]) | int >= min_battery_level or setpoint < 0)
              and (states(battery_soc_entity[i]) | int <= max_battery_level or setpoint > 0) %}
             {% set batteries.available = batteries.available + [i] %}
@@ -486,6 +489,19 @@ action:
         
         {% set divisor = (batteries.available | count) if (batteries.available | count) > 0 else 1 %}
         {% for i in batteries.available %}
+        
+                
+          {# --- Bepaal de integratie --- #}
+          {% set dev = device_id(battery_rs485_control_entity[i]) %}
+          {% set ids = device_attr(dev, 'identifiers') or [] %}
+          {% set integrations = ids | map('first') | list %}
+          {% if integrations | count > 0 %}
+            {% set integration = integrations[0] %}
+          {% else %}
+            {% set integration = 'unknown' %}
+          {% endif %}
+                    
+        
           {% set value = (setpoint / divisor) | int %}
           
           {# Pas max en min limieten toe #}
@@ -498,16 +514,30 @@ action:
             "setpointdischarge": battery_setpointdischarge_entity[i],
             "rs485_control": battery_rs485_control_entity[i],
             "mode": battery_mode_entity[i],
+            "integration": integration,
             "value": value
           }] %}
         {% endfor %}
         
+        
         {% for i in batteries.standby %}
+        
+          {# --- Bepaal de integratie --- #}
+          {% set dev = device_id(battery_rs485_control_entity[i]) %}
+          {% set ids = device_attr(dev, 'identifiers') or [] %}
+          {% set integrations = ids | map('first') | list %}
+          {% if integrations | count > 0 %}
+            {% set integration = integrations[0] %}
+          {% else %}
+            {% set integration = 'unknown' %}
+          {% endif %}
+        
           {% set batteries.entities = batteries.entities + [{
             "setpointcharge": battery_setpointcharge_entity[i],
             "setpointdischarge": battery_setpointdischarge_entity[i],
             "rs485_control": battery_rs485_control_entity[i],
             "mode": battery_mode_entity[i],
+            "integration": integration,
             "value": 0
           }] %}
         {% endfor %}
@@ -524,7 +554,7 @@ action:
               data:
                 name: "Debug"
                 message: >
-                  battery_setpoints: {{ battery_setpoints }}
+                  battery_setpoints: {{ battery_setpoints }} {{battery_rs485_control_entity}}
 
 
   # --- Nul setpoints (standby / idle) ---
@@ -540,19 +570,31 @@ action:
               sequence:
                 - condition: template
                   value_template: >
-                    {{ states(repeat.item.rs485_control) == "enable" }}
+                      {% set state = states(repeat.item.rs485_control) %}
+                      {{ (repeat.item.integration == 'esphome' and state == 'enable')
+                         or (repeat.item.integration == 'marstek_modbus' and state == 'on') }}
                 - choose:
                     - conditions:
                         - condition: template
                           value_template: >
-                            {{ states(repeat.item.mode) != "stop" }}
+                            {% set state = states(repeat.item.rs485_control) %}
+                            {{ (repeat.item.integration == 'esphome' and state != 'stop')
+                              or (repeat.item.integration == 'marstek_modbus' and state != 'standby') }}
+                            
                       sequence:
                         - action: select.select_option
                           target:
                             entity_id: >
+                              {# als mode is niet minder dan x minuten geleden gewijzigd #}
                               {{ repeat.item.mode }}
+                              
                           data:
-                            option: stop
+                            option: >
+                                {% if repeat.item.integration == 'esphome' %}
+                                   stop
+                                {% elif repeat.item.integration == 'marstek_modbus' %}
+                                  standby
+                                {%endif%}
                         - action: number.set_value
                           continue_on_error: true
                           target:
@@ -581,7 +623,9 @@ action:
               sequence:
                 - condition: template
                   value_template: >
-                    {{ states(repeat.item.rs485_control) == "enable" }}
+                      {% set state = states(repeat.item.rs485_control) %}
+                      {{ (repeat.item.integration == 'esphome' and state == 'enable')
+                         or (repeat.item.integration == 'marstek_modbus' and state == 'on') }}
                 - choose:
                     - conditions:
                         - condition: template
@@ -631,7 +675,7 @@ action:
               sequence:
                 - condition: template
                   value_template: >
-                    {{ states(repeat.item.rs485_control) == "enable" }}
+                    {{ states(repeat.item.rs485_control) == "enable" or states(repeat.item.rs485_control) == "on" }}
                 - choose:
                     - conditions:
                         - condition: template

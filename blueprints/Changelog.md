@@ -1,3 +1,6 @@
+Version: 1.9  
+New: [HA integration marstek venus modbus](https://github.com/ViperRNMC/marstek_venus_modbus/tree/main) support  
+
 Version: 1.8 Let's go smooth!  
 Breaking: smoothing is renamed to smoothing_max_watts  
 New: minimum different in setpoint change  
