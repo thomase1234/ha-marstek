@@ -2,22 +2,14 @@ blueprint:
   name: Marstek X range on the Meter
   description: >
     Control  Marstek Batteries according to a grid sensor and a target range  
-    
+
     **Version: 1.9 **
 
     New: [marstek venus modbus](https://github.com/ViperRNMC/marstek_venus_modbus/tree/main) support
 
-
-    
-
-
-
-  
-
-  author: Tazzios (Based on PimDoos`s works)                   
+  author: Tazzios (Based on PimDoos`s works)
   domain: automation
   input:
-
     battery_section:
       name: Battery selection
       icon: mdi:battery
@@ -33,7 +25,7 @@ blueprint:
               multiple: true
         battery_soc_min:
           name: Minimum State of Charge
-          description: Batteries below this level will not participate in the load balancing pool                                                                                                
+          description: Batteries below this level will not participate in the load balancing pool
           default: 0
           selector:
             number:
@@ -41,7 +33,7 @@ blueprint:
               max: 99
         battery_soc_max:
           name: Maximum State of Charge
-          description: Batteries above this level will not participate in the load balancing pool                                                                                                 
+          description: Batteries above this level will not participate in the load balancing pool
           default: 100
           selector:
             number:
@@ -50,12 +42,12 @@ blueprint:
 
     rotation_section:
       name: Battery rotation
-      description: Rotate multiple batteries 
+      description: Rotate multiple batteries
       icon: mdi:rotate-3d-variant
       input:
         priority_offset_template:
           name: Priority offset template
-          description: Template defining a value to rotate battery priority by. Values higher than the number of batteries will loop back to 0.                                                                                                                                              
+          description: Template defining a value to rotate battery priority by. Values higher than the number of batteries will loop back to 0.
           default: "{{ now().timetuple().tm_yday }}"
           selector:
             template:
@@ -68,12 +60,12 @@ blueprint:
 
     power_section:
       name: Power
-      description: Power settings  
+      description: Power settings
       icon: mdi:flash
       input:
         battery_optimal_min:
           name: Battery Minimum power
-          description: Minimum power to start a single battery with charge or discharge. 
+          description: Minimum power to start a single battery with charge or discharge.
           default: 20
           selector:
             number:
@@ -89,17 +81,17 @@ blueprint:
               max: 2500
         battery_optimal_max:
           name: Battery maximum power
-          description: Maximum  power that a single battery is allowed for charge or discharge.                                                                                     
+          description: Maximum  power that a single battery is allowed for charge or discharge.
           default: 2500
           selector:
             number:
               min: 50
               max: 2500
         # This value represents the minimum(aka charging) total setpoint for all batteries combined.
-        # It will be inverted later in the blueprint to calculate 'min_setpoint' for logic.                                                                                                  
+        # It will be inverted later in the blueprint to calculate 'min_setpoint' for logic.
         setpoint_min:
           name: Maximum charging
-          description:  If this is 0, charging is disabled. Total setpoint for all batteries combined.                                                                                                   
+          description: If this is 0, charging is disabled. Total setpoint for all batteries combined.
           default: 12000
           selector:
             number:
@@ -108,13 +100,13 @@ blueprint:
               mode: box
         setpoint_max:
           name: Maximum discharging
-          description: If this is 0, discharging is disabled. Total setpoint for all batteries combined.                                                                                                        
+          description: If this is 0, discharging is disabled. Total setpoint for all batteries combined.
           default: 12000
           selector:
             number:
               min: 0
               max: 12000
-              mode: box              
+              mode: box
 
     target_section:
       name: Target
@@ -122,7 +114,7 @@ blueprint:
       input:
         grid_entity:
           name: Grid
-          description: Entity measuring grid net consumption                                                            
+          description: Entity measuring grid net consumption
           selector:
             entity:
               filter:
@@ -130,7 +122,7 @@ blueprint:
                 device_class: power
         offset_entity:
           name: Offset entities
-          description: Entities whose value (in Watts) should be subtracted from the grid sensor. E.g. Car charger power sensor                                                                                                                               
+          description: Entities whose value (in Watts) should be subtracted from the grid sensor. E.g. Car charger power sensor
           default: []
           selector:
             entity:
@@ -144,11 +136,11 @@ blueprint:
     setpoint_section:
       name: Setpoint
       description: You can create a deadband (-50 and 50) or set them the same if you want a fixed target. High value for charging and negative value for discharging.
-      icon: mdi:flash                     
+      icon: mdi:flash
       input:
         setpoint_target_min:
           name: Target minimum value
-          description: Lower limit for the Grid target band (in Watts)                                                               
+          description: Lower limit for the Grid target band (in Watts)
           default: -200
           selector:
             number:
@@ -157,38 +149,38 @@ blueprint:
               mode: box
         setpoint_target_max:
           name: Target maximum value
-          description: Upper limit for the Grid target band (in Watts)                                                                
+          description: Upper limit for the Grid target band (in Watts)
           default: 200
           selector:
             number:
               min: -5000
               max: 10000
               mode: box
- 
+
     smooth_section:
       name: smoothing
       description: Various option to control the smoothing of the setpoint.
-      icon: mdi:tune                  
+      icon: mdi:tune
       input:
         smoothing_min_watts:
           name: Minimum differents
-          description: Hysteresis, minimum delta (in watts) between previous and new setpoints. This should not be lower than the Minimum Power of one battery.                                                                                                                   
+          description: Hysteresis, minimum delta (in watts) between previous and new setpoints. This should not be lower than the Minimum Power of one battery.
           default: 25
           selector:
             number:
               min: 0
               max: 500
         smoothing_max_watts:
-          name: Maximum differents 
-          description: Maximum delta (in watts) between previous and new setpoints.                                                                                                                   
+          name: Maximum differents
+          description: Maximum delta (in watts) between previous and new setpoints.
           default: 2000
           selector:
             number:
               min: 50
               max: 10000
         smoothing_above:
-          name: Smoothing above 
-          description: Apply the smoothing factor only above this delta (in watts).                                                                                                                   
+          name: Smoothing above
+          description: Apply the smoothing factor only above this delta (in watts).
           default: 1000
           selector:
             number:
@@ -196,7 +188,7 @@ blueprint:
               max: 5000
         smoothing_factor:
           name: smoothing factor
-          description: Example with old setpoint 1500 new 500 and factor 0.7. The differents 1500-500= 1000*0.7=700 new setpoint will be 1500-700=800. 1 to disable.                                                                                                                     
+          description: Example with old setpoint 1500 new 500 and factor 0.7. The differents 1500-500= 1000*0.7=700 new setpoint will be 1500-700=800. 1 to disable.
           default: 0.7
           selector:
             number:
@@ -205,7 +197,7 @@ blueprint:
               max: 1
         smoothing_factor_zero:
           name: smoothing factor when passing zero
-          description: Same as above only this one is used when 0 is crossed. Set this lower to avoid switching between charge/discharge. 1 to disable                                                                                                                  
+          description: Same as above only this one is used when 0 is crossed. Set this lower to avoid switching between charge/discharge. 1 to disable
           default: 0.3
           selector:
             number:
@@ -213,14 +205,13 @@ blueprint:
               min: 0.01
               max: 1
 
-              
     script_section:
       name: Script
       icon: mdi:tune
       input:
         update_interval:
           name: Update interval
-          description: Time to wait before accepting new data from the grid sensor                                                                                
+          description: Time to wait before accepting new data from the grid sensor
           default:
             seconds: 10
           selector:
@@ -232,20 +223,19 @@ blueprint:
           selector:
             boolean: {}
 
-
 variables:
   # Batttery selection
-  device_ids: !input battery_device  
+  device_ids: !input battery_device
   min_battery_level: !input battery_soc_min
   max_battery_level: !input battery_soc_max
 
   # Battery rotation
   priority_offset_template: !input priority_offset_template
   sort_by_soc: !input sort_by_soc
-  
+
   # Power
   min_battery_power: !input battery_optimal_min
-  balancing_battery_power : !input battery_optimal_balancing
+  balancing_battery_power: !input battery_optimal_balancing
   max_battery_power: !input battery_optimal_max
   # This makes 'min_setpoint' the opposite (negative) of the configured minimum setpoint.
   # For example: if setpoint_min = 12000 → min_setpoint = -12000
@@ -253,25 +243,23 @@ variables:
   min_setpoint: >
     {{ 0 - (setpoint_min | float) }}
   max_setpoint: !input setpoint_max
- 
   # Target
   grid_entity: !input grid_entity
   offset_entity: !input offset_entity
-  
+
   # Setpoint
   target_min: !input setpoint_target_min
   target_max: !input setpoint_target_max
-  
+
   #smoothing
   smoothing_min_watts: !input smoothing_min_watts
   smoothing_max_watts: !input smoothing_max_watts
   smoothing_above: !input smoothing_above
   smoothing_factor: !input smoothing_factor
   smoothing_factor_zero: !input smoothing_factor_zero
-  
+
   # Script
   debug: !input debug
-  
 
 trigger:
   - trigger: state
@@ -288,7 +276,7 @@ action:
         {% set multiplier = 1 if grid_unit == "W" else 1000 if grid_unit == "kW" else 1 %}
         {% set grid_power = states(grid_entity) | float %}
         {{ grid_power * multiplier }}
-        
+
       offset_total: >
         {{ (offset_entity if offset_entity is iterable else [offset_entity] | default([])) 
          | map('states') 
@@ -298,7 +286,7 @@ action:
       # Count all actueel delivered power of the batteries together
       Battery_ac_power_total: >
         {% set total_ac_power = namespace(value=0) %}
-        
+
         {% for dev in device_ids %}
           {% set ac_entity = device_entities(dev) | select("search","(ac_power|ac_vermogen)$") | list %}
           {% if ac_entity %}
@@ -306,7 +294,7 @@ action:
             {% set total_ac_power.value = total_ac_power.value + ac_value %}
           {% endif %}
         {% endfor %}
-        
+
         {{ total_ac_power.value }}
 
       setpoint: >
@@ -348,35 +336,31 @@ action:
          
         {# --- exponentiële smoothing toepassen --- #}
         {% set setpoint_smooth = sf * raw_setpoint + (1 - sf) * Battery_ac_power_total %}
-        
+
         {{ setpoint_smooth | round(0) }}
 
-         
-         
   - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ debug }}"
-          sequence:
-            - service: logbook.log
-              data:
-                name: "Debug"
-                message: >
-                  grid: {{ grid }}
-                  offset_total: {{ offset_total }}
-                  Battery_ac_power_total: {{ Battery_ac_power_total }}
-                  setpoint: {{ setpoint }}
-    
+      - conditions:
+          - condition: template
+            value_template: "{{ debug }}"
+        sequence:
+          - service: logbook.log
+            data:
+              name: "Debug"
+              message: >
+                grid: {{ grid }}
+                offset_total: {{ offset_total }}
+                Battery_ac_power_total: {{ Battery_ac_power_total }}
+                setpoint: {{ setpoint }}
 
-        
-  # order devices       
+  # order devices
   - variables:
       # Hernoemen naar reordeed ofzo
       device_ids: >
         {% if device_ids is string %}
             {% set device_ids = [ device_ids ] %}
         {% endif %}
-        
+
         {% set soc_map = namespace(list=[]) %}
         {% for dev in device_ids %}
           {% set soc_entity = device_entities(dev) | select("search", "(state_of_charge|battery_soc|batterij_soc|batterie-Ladezustand)$") | list %}
@@ -392,7 +376,7 @@ action:
             {% set soc_map.list = soc_map.list + [[soc_rounded, dev]] %}
           {% endif %}
         {% endfor %}
-        
+
         {% if setpoint < 0 %} 
           {{ soc_map.list | sort(attribute=0) | map('last') | list }}
         {% else %}
@@ -400,13 +384,13 @@ action:
         {% endif %}
 
       battery_count: >
-         {% if device_ids is string %}
-            {% set ids = [device_ids] %}
-          {% else %}
-            {% set ids = device_ids %}
-          {% endif %}
-          {{ ids | count }}
-          
+        {% if device_ids is string %}
+           {% set ids = [device_ids] %}
+         {% else %}
+           {% set ids = device_ids %}
+         {% endif %}
+         {{ ids | count }}
+
       priority_offset: >
         {% if sort_by_soc  %}
             {{ 0 }}
@@ -415,20 +399,19 @@ action:
         {% endif %}
 
   - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ debug }}"
-          sequence:
-            - service: logbook.log
-              data:
-                name: "Debug"
-                message: >
-                  device_ids: {{ device_ids }}
-                  battery_count: {{ battery_count }}
-                  priority_offset: {{ priority_offset }}
+      - conditions:
+          - condition: template
+            value_template: "{{ debug }}"
+        sequence:
+          - service: logbook.log
+            data:
+              name: "Debug"
+              message: >
+                device_ids: {{ device_ids }}
+                battery_count: {{ battery_count }}
+                priority_offset: {{ priority_offset }}
 
-        
-  # Battery entities into an array        
+  # Battery entities into an array
   - variables:
       # Get Entity IDs from device IDs
       # in the search the entitity searchs is as followed lily / m5stack, ViperRNMC EN,ViperRNMC NL, ViperRNMC De
@@ -445,7 +428,7 @@ action:
           {% set entities.mode = entities.mode + [device_entities(device_id) | list | select("search","(forcible_charge_discharge|force_mode|geforceerde_modus|force_mode)$") | list | join("")] %}
         {% endfor %}
         {{ entities.mode[priority_offset:] + entities.mode[:priority_offset] }}
-        
+
       battery_setpointcharge_entity: >
         {% set entities = namespace(setpointcharge=[]) %}
         {% for device_id in device_ids %}
@@ -467,15 +450,14 @@ action:
         {% endfor %}
         {{ entities.soc[priority_offset:] + entities.soc[:priority_offset] }}
 
-
-  - variables:      
+  - variables:
       battery_setpoints: >
         {% set num_optimal = ((setpoint | abs) / balancing_battery_power) | round(0,'ceil') %}
         {% set batteries = namespace(entities=[], available=[], standby=[]) %}
 
         {# Verdeel batteries in beschikbaar / standby #}
         {% for i in range(0,battery_count) %}
-        
+
 
           {% if batteries.available | count < num_optimal 
              and (states(battery_rs485_control_entity[i]) == "enable" or states(battery_rs485_control_entity[i]) == "on")
@@ -486,15 +468,15 @@ action:
             {% set batteries.standby = batteries.standby + [i] %}
           {% endif %}									 		 
         {% endfor %}
-        
+
         {% set divisor = (batteries.available | count) if (batteries.available | count) > 0 else 1 %}
         {% for i in batteries.available %}
-        
+
                 
           {# --- Bepaal de integratie --- #}
           {% set integration = config_entry_attr(config_entry_id(battery_rs485_control_entity[i]), 'domain') %}  
                     
-        
+
           {% set value = (setpoint / divisor) | int %}
           
           {# Pas max en min limieten toe #}
@@ -511,13 +493,13 @@ action:
             "value": value
           }] %}
         {% endfor %}
-        
-        
+
+
         {% for i in batteries.standby %}
-        
+
           {# --- Bepaal de integratie --- #}
           {% set integration = config_entry_attr(config_entry_id(battery_rs485_control_entity[i]), 'domain') %}  
-        
+
           {% set batteries.entities = batteries.entities + [{
             "setpointcharge": battery_setpointcharge_entity[i],
             "setpointdischarge": battery_setpointdischarge_entity[i],
@@ -530,18 +512,16 @@ action:
 
         {{ batteries.entities }}
 
-
   - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ debug }}"
-          sequence:
-            - service: logbook.log
-              data:
-                name: "Debug"
-                message: >
-                  battery_setpoints: {{ battery_setpoints }} {{battery_rs485_control_entity}}
-
+      - conditions:
+          - condition: template
+            value_template: "{{ debug }}"
+        sequence:
+          - service: logbook.log
+            data:
+              name: "Debug"
+              message: >
+                battery_setpoints: {{ battery_setpoints }} {{battery_rs485_control_entity}}
 
   # --- Nul setpoints (standby / idle) ---
   - choose:
@@ -556,9 +536,9 @@ action:
               sequence:
                 - condition: template
                   value_template: >
-                      {% set state = states(repeat.item.rs485_control) %}
-                      {{ (repeat.item.integration == 'esphome' and state == 'enable')
-                         or (repeat.item.integration == 'marstek_modbus' and state == 'on') }}
+                    {% set state = states(repeat.item.rs485_control) %}
+                    {{ (repeat.item.integration == 'esphome' and state == 'enable')
+                       or (repeat.item.integration == 'marstek_modbus' and state == 'on') }}
                 - choose:
                     - conditions:
                         - condition: template
@@ -566,21 +546,17 @@ action:
                             {% set state = states(repeat.item.rs485_control) %}
                             {{ (repeat.item.integration == 'esphome' and state != 'stop')
                               or (repeat.item.integration == 'marstek_modbus' and state != 'standby') }}
-                            
+
                       sequence:
                         - action: select.select_option
                           target:
                             entity_id: >
                               {# als mode is niet minder dan x minuten geleden gewijzigd #}
                               {{ repeat.item.mode }}
-                              
+
                           data:
                             option: >
-                                {% if repeat.item.integration == 'esphome' %}
-                                   stop
-                                {% elif repeat.item.integration == 'marstek_modbus' %}
-                                  standby
-                                {%endif%}
+                              stop
                         - action: number.set_value
                           continue_on_error: true
                           target:
@@ -609,9 +585,9 @@ action:
               sequence:
                 - condition: template
                   value_template: >
-                      {% set state = states(repeat.item.rs485_control) %}
-                      {{ (repeat.item.integration == 'esphome' and state == 'enable')
-                         or (repeat.item.integration == 'marstek_modbus' and state == 'on') }}
+                    {% set state = states(repeat.item.rs485_control) %}
+                    {{ (repeat.item.integration == 'esphome' and state == 'enable')
+                       or (repeat.item.integration == 'marstek_modbus' and state == 'on') }}
                 - choose:
                     - conditions:
                         - condition: template
@@ -682,7 +658,7 @@ action:
                   data:
                     value: >
                       {{ repeat.item.value | int }}
-                - choose:      
+                - choose:
                     - conditions:
                         - condition: template
                           value_template: >
@@ -695,5 +671,5 @@ action:
                               {{ repeat.item.setpointcharge }}
                           data:
                             value: 0
-                    
+
   - delay: !input update_interval
