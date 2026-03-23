@@ -307,11 +307,11 @@ action:
               {% set total_ac_power.value = total_ac_power.value + ac_value %}
             {% elif states(mode_entity[0]) == "charge" %}
               {% set power_entity = device_entities(dev) | select("search","(forcible_charge_power)$") | list %}
-              {% set ac_value = states(power_entity[0]) | int %}
+              {% set ac_value = states(power_entity[0]) | | float(0) %}
               {% set total_ac_power.value = total_ac_power.value - ac_value %}
             {% elif states(mode_entity[0]) == "discharge" %}
               {% set power_entity = device_entities(dev) | select("search","(forcible_discharge_power)$") | list %}
-              {% set ac_value = states(power_entity[0]) | int %}
+              {% set ac_value = states(power_entity[0]) | | float(0) %}
               {% set total_ac_power.value = total_ac_power.value + ac_value %}
             {% endif %}
           {% endif %}
