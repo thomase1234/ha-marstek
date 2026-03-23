@@ -296,7 +296,7 @@ action:
         {% endfor %}
 
         {{ total_ac_power.value }}
-      Battery_ac_power_total: |
+      Battery_ac_power_total: >
         {% set total_ac_power = namespace(value=0) %}
         {% for dev in device_ids %}
           {% set mode_entity = device_entities(dev) | select("search","(force_mode)$") | list %}
