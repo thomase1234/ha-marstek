@@ -1,5 +1,5 @@
 blueprint:
-  name: Marstek X range on the Meter
+  name: Marstek X range on the Meter - but faster
   description: >
     Control  Marstek Batteries according to a grid sensor and a target range  
 
@@ -7,7 +7,7 @@ blueprint:
 
     New: [marstek venus modbus](https://github.com/ViperRNMC/marstek_venus_modbus/tree/main) support
 
-  author: Tazzios (Based on PimDoos`s works)
+  author: Thomas (Based on Tazzios (Based on PimDoos`s works))
   domain: automation
   input:
     battery_section:
