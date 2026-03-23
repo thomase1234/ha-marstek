@@ -284,7 +284,7 @@ action:
          | sum }}
 
       # Count all actueel delivered power of the batteries together
-      Battery_ac_power_total: >
+      Battery_ac_power_total_old: >
         {% set total_ac_power = namespace(value=0) %}
 
         {% for dev in device_ids %}
@@ -296,7 +296,27 @@ action:
         {% endfor %}
 
         {{ total_ac_power.value }}
-
+      Battery_ac_power_total: |
+        {% set total_ac_power = namespace(value=0) %}
+        {% for dev in device_ids %}
+          {% set mode_entity = device_entities(dev) | select("search","(force_mode)$") | list %}
+          {% if mode_entity %}
+          {{ states(mode_entity[0]) }}
+            {% if states(mode_entity[0]) == "stop" %}
+              {% set ac_value = 0 %}
+              {% set total_ac_power.value = total_ac_power.value + ac_value %}
+            {% elif states(mode_entity[0]) == "charge" %}
+              {% set power_entity = device_entities(dev) | select("search","(forcible_charge_power)$") | list %}
+              {% set ac_value = states(power_entity[0]) | int %}
+              {% set total_ac_power.value = total_ac_power.value - ac_value %}
+            {% elif states(mode_entity[0]) == "discharge" %}
+              {% set power_entity = device_entities(dev) | select("search","(forcible_discharge_power)$") | list %}
+              {% set ac_value = states(power_entity[0]) | int %}
+              {% set total_ac_power.value = total_ac_power.value + ac_value %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {{ total_ac_power.value }}
       setpoint: >
         {% set net_load = Battery_ac_power_total + grid %}
         {% if net_load < target_min %}
