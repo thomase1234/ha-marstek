@@ -301,7 +301,6 @@ action:
         {% for dev in device_ids %}
           {% set mode_entity = device_entities(dev) | select("search","(force_mode)$") | list %}
           {% if mode_entity %}
-          {{ states(mode_entity[0]) }}
             {% if states(mode_entity[0]) == "stop" %}
               {% set ac_value = 0 %}
               {% set total_ac_power.value = total_ac_power.value + ac_value %}
